@@ -179,6 +179,7 @@ public class Tree extends Component {
         
         private void cacheComponent(TreePath treePath, int column, Component component) {
             if (1 == columnCount) {
+                System.out.println( "cacheComponent: path: " + treePath.toString() + ", column:"+column  + ", component: "+component);
                 treePathToComponentCache.put(treePath, component);
             } else {
                 List list;
@@ -1195,7 +1196,9 @@ public class Tree extends Component {
     public Component getComponent(TreePath path, int column) {
         // FIXME throw when out of bounds?
         if (columnModel.getColumnCount() == 1) {
-            return (Component) treePathToComponentCache.get(path);
+            Component c = (Component) treePathToComponentCache.get(path);
+            System.out.println( "path: " + path.toString() + ", column:"+column  + ", c: "+c);
+            return c;
         } else {
             List list = (List) treePathToComponentCache.get(path);
             if (list != null)

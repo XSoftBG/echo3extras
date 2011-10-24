@@ -375,6 +375,7 @@ extends AbstractComponentSynchronizePeer {
             
             renderedPaths.add(path);
             Component component = tree.getComponent(path, 0);
+            if( component == null ) { System.out.println( "renderNode: invalid path: " + path.toString() + ", column: 0" ); return; }
             boolean expanded = tree.isExpanded(path);
             String id = userInstance.getClientRenderId(component);
             Element eElement = document.createElement("e");
