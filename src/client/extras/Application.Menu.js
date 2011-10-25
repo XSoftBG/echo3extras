@@ -492,6 +492,12 @@ Extras.MenuStateModel = Core.extend({
     _disabledItems: null,
     
     /**
+     * Hided menu item ids.
+     * @type Array
+     */
+    _hidedItems: null,
+
+    /**
      * Selected menu item ids.
      * @type Array
      */
@@ -503,8 +509,27 @@ Extras.MenuStateModel = Core.extend({
     $construct: function() {
         this._disabledItems = [];
         this._selectedItems = [];
+        this._hidedItems    = [];
     },
     
+    /**
+     * Determines if the specified menu item is visible.
+     *
+     * @param {String} modelId the item model id
+     * @return true if the item is visible
+     * @type Boolean
+     */
+    isVisible: function(modelId) {
+        if (modelId) {
+            for (var i = 0; i < this._hidedItems.length; i++) {
+                if (this._hidedItems[i] == modelId) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    },
+
     /**
      * Determines if the specified menu item is enabled.
      *
@@ -541,6 +566,22 @@ Extras.MenuStateModel = Core.extend({
         return false;
     },
     
+    /**
+     * Sets the visiblity state of a menu item.
+     *
+     * @param {String} modelId the item model id
+     * @param {Boolean} visible the visibilty state
+     */
+    setVisible: function(modelId, visible) {
+        if (visible) {
+            Core.Arrays.remove(this._hidedItems, modelId);
+        } else {
+            if (Core.Arrays.indexOf(this._hidedItems, modelId) == -1) {
+                this._hidedItems.push(modelId);
+            }
+        }
+    },
+
     /**
      * Sets the enabled state of a menu item.
      *

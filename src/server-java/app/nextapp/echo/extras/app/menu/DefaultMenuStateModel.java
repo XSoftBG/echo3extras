@@ -39,6 +39,14 @@ public class DefaultMenuStateModel extends AbstractMenuStateModel {
 
     private Set selectedIdSet = null;
     private Set disabledIdSet = null;
+    private Set hidedIdSet = null;
+
+    /**
+     * @see nextapp.echo.extras.app.menu.MenuStateModel#isVisible(java.lang.String)
+     */
+    public boolean isVisible(String id) {
+        return hidedIdSet == null || !hidedIdSet.contains(id);
+    }
 
     /**
      * @see nextapp.echo.extras.app.menu.MenuStateModel#isEnabled(java.lang.String)
@@ -54,6 +62,21 @@ public class DefaultMenuStateModel extends AbstractMenuStateModel {
         return selectedIdSet != null && selectedIdSet.contains(id);
     }
     
+    /**
+     * @see nextapp.echo.extras.app.menu.MenuStateModel#setVisible(java.lang.String, boolean)
+     */
+    public void setVisible(String id, boolean visible) {
+        if (hidedIdSet == null) {
+            hidedIdSet = new HashSet();
+        }
+        if (visible) {
+            hidedIdSet.remove(id);
+        } else { 
+            hidedIdSet.add(id);
+        }
+        fireStateChanged();
+    }
+
     /**
      * @see nextapp.echo.extras.app.menu.MenuStateModel#setEnabled(java.lang.String, boolean)
      */

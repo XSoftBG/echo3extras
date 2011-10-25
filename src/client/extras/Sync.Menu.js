@@ -662,6 +662,8 @@ Extras.Sync.Menu.RenderedMenu = Core.extend({
 
         for (i = 0; i < items.length; ++i) {
             item = items[i];
+            if( !this.stateModel.isVisible(item.modelId) ) 
+                continue;
             if (item instanceof Extras.OptionModel || item instanceof Extras.MenuModel) {
                 menuItemTr = document.createElement("tr");
                 this.itemElements[item.id] = menuItemTr;
@@ -1006,12 +1008,12 @@ Extras.Sync.ContextMenu = Core.extend(Extras.Sync.Menu, {
     },
  
     activate: function() {
-       if( !this.active ) this.component.set( 'menuVisible', true );
+       if( !this.active ) this.component.set( 'menuVisible', true, true );
        Extras.Sync.Menu.prototype.activate.call(this);
     },
 
     deactivate: function() {
-       if( this.active ) this.component.set( 'menuVisible', false );             
+       if( this.active ) this.component.set( 'menuVisible', false, true );             
        Extras.Sync.Menu.prototype.deactivate.call(this);
     },
    
@@ -1054,10 +1056,8 @@ Extras.Sync.ContextMenu = Core.extend(Extras.Sync.Menu, {
                 this.activateItem(this.menuModel);
               }
               else
-              {
-                this.deactivate();
-                reOpenMenu = false;
-              }
+                 this.deactivate();
+              reOpenMenu = false;
             }
 
             if (reOpenMenu) {

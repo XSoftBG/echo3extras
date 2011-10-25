@@ -54,6 +54,14 @@ public interface MenuStateModel extends Serializable {
      * @return true if it is enabled
      */
     public boolean isEnabled(String id);
+
+    /**
+     * Determines if a specific menu option is visible.
+     * 
+     * @param id the id of the menu option
+     * @return true if it is visible
+     */
+    public boolean isVisible(String id);
     
     /**
      * Determines if a specific menu option is selected.
@@ -79,6 +87,14 @@ public interface MenuStateModel extends Serializable {
      */
     public void setEnabled(String id, boolean enabled);
     
+    /**
+     * Sets the visible state of a specific menu option.
+     * 
+     * @param id the id of the menu option
+     * @param visible the new visible state
+     */
+    public void setVisible(String id, boolean visible);
+
     /**
      * Sets the selection state of a specific menu option.
      * 

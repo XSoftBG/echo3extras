@@ -158,6 +158,10 @@ Extras.Serial.MenuStateModel = Core.extend(Echo.Serial.PropertyTranslator, {
             var children = Core.Web.DOM.getChildElementsByTagName(pElement, "i");
             for (var i = 0; i < children.length; i++) {
                 var childElement = children[i];
+                var visibleValue = childElement.getAttribute("visible");
+                if (visibleValue != null) {
+                    stateModel.setVisible(childElement.getAttribute("id"), visibleValue == "true");
+                }
                 var enabledValue = childElement.getAttribute("enabled");
                 if (enabledValue != null) {
                     stateModel.setEnabled(childElement.getAttribute("id"), enabledValue == "true");

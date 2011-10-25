@@ -111,6 +111,9 @@ abstract class AbstractMenuPeer extends AbstractComponentSynchronizePeer {
             if (id != null) {
                 Element itemElement = serialContext.getDocument().createElement("i");
                 itemElement.setAttribute("id", id);
+                if (!menuStateModel.isVisible(id)) {
+                    itemElement.setAttribute("visible", "false");
+                }
                 if (!menuStateModel.isEnabled(id)) {
                     itemElement.setAttribute("enabled", "false");
                 }
