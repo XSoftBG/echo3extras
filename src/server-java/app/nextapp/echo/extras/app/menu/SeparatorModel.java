@@ -35,10 +35,14 @@ package nextapp.echo.extras.app.menu;
 public class SeparatorModel 
 implements ItemModel {
 
+    private final String id;
+
+    public SeparatorModel(String _id) { id = _id; }
+
     /**
      * @see nextapp.echo.extras.app.menu.ItemModel#getId()
      */
     public String getId() {
-        return null;
+        return id;
     }
 }
