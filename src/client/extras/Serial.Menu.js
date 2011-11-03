@@ -136,7 +136,8 @@ Extras.Serial.SeparatorModel = Core.extend(Echo.Serial.PropertyTranslator, {
 
         /** @see Echo.Serial.PropertyTranslator#toProperty */
         toProperty: function(client, pElement) {
-            return new Extras.SeparatorModel();
+            var id = pElement.getAttribute("id");
+            return new Extras.SeparatorModel(id);
         }
     },
     

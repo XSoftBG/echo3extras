@@ -478,7 +478,21 @@ Extras.RadioOptionModel = Core.extend(Extras.ToggleOptionModel, {
 /**
  * A representation of a menu separator.
  */
-Extras.SeparatorModel = Core.extend(Extras.ItemModel, { });
+Extras.SeparatorModel = Core.extend(Extras.ItemModel, 
+{ 
+    /**
+     * Creates a new SeparatorModel.
+     * @param {String} modelId the id of the menu model
+     */ 
+    $construct: function(modelId) {
+        this.modelId = modelId;
+    },
+    
+    /** @see Object#toString */
+    toString: function() {
+        return "SeparatorModel\"" + this.modelId + "\"";
+    }
+});
 
 /**
  * Representation of menu model state, describing which items are selected and/or disabled.

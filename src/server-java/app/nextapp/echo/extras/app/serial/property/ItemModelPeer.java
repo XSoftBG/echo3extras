@@ -105,6 +105,10 @@ public class ItemModelPeer implements SerialPropertyPeer {
     
     private void toXml(Context context, Class objectClass, Element propertyElement, SeparatorModel model) {
         propertyElement.setAttribute("t", SerialPropertyPeerConstants.PROPERTY_TYPE_PREFIX + "SeparatorModel");
+        final String id = model.getId();
+        if (id != null) {
+            propertyElement.setAttribute("id", id);
+        }
     }
     
     private void writeIdIconAndText(Context context, Class objectClass, Element propertyElement, String id, String text, ImageReference icon) throws SerialException {
