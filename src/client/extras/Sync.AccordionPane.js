@@ -17,10 +17,16 @@ Extras.Sync.AccordionPane = Core.extend(Echo.Render.ComponentSync, {
          */
         _DEFAULTS: {
             tabBackground: "#cfcfcf",
-            tabBorder: "1px outset #cfcfcf",
+            /* tabBorder: "1px outset #cfcfcf", */
             tabForeground: "#000000",
             tabInsets: "2px 5px",
-            tabContentInsets: 0
+            tabContentInsets: 0,
+            tabBorder: {
+                bottom: "1px solid #73716d",
+                left: "1px solid #f0efed",
+                right: "1px solid #73716d",
+                top: "1px solid #f0efed"
+            }
         }
     },
     
