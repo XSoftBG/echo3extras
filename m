@@ -1,5 +1,5 @@
 :
-export SERVLET_LIB_JAR="/usr/local/apache-tomcat-6.0.26/lib/servlet-api.jar"
+export SERVLET_LIB_JAR="../Dolphin/lib/servlet-api.jar"
 export ECHO3_LIB_HOME=../echo3/dist/lib
 ant clean
 ant

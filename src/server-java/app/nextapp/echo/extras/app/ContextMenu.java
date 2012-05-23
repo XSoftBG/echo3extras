@@ -65,7 +65,6 @@ implements PaneContainer {
     public static final String PROPERTY_SELECTION_BACKGROUND_IMAGE = "selectionBackgroundImage";
     public static final String PROPERTY_SELECTION_FOREGROUND = "selectionForeground";
     public static final String PROPERTY_MENU_VISIBLE = "menuVisible";
-    private boolean menu_visible = false;
     /**
      * Creates a new <code>ContextMenu</code> with an empty
      * <code>DefaultMenuModel</code> as its model and a
@@ -118,20 +117,17 @@ implements PaneContainer {
     /**
      * Sets the visibility state of this <code>context menu</code>.
      */
-    public void setMenuVisible(boolean v) 
-    { 
-      boolean menu_visible_old = menu_visible;
-      if( menu_visible_old != v )
-      {          
-        menu_visible = v;
-        firePropertyChange( PROPERTY_MENU_VISIBLE, Boolean.valueOf(menu_visible_old), Boolean.valueOf(menu_visible) );
-      }
+    public void setMenuVisible(Boolean v) {
+        set(PROPERTY_MENU_VISIBLE, v);
     }
 
     /**
      * Returns the visibility state of this <code>context menu</code>.
     */
-    public boolean isMenuVisible() { return menu_visible; }
+    public Boolean isMenuVisible() {
+        final Object propValue = get(PROPERTY_MENU_VISIBLE);
+        return propValue != null ? (Boolean) propValue : Boolean.FALSE;
+    }
 
     /**
      * Returns the activation mode of the context menu.
@@ -361,10 +357,10 @@ implements PaneContainer {
 
     public void processInput(String name, Object value) {
         if (PROPERTY_MENU_VISIBLE.equals(name)) {
-          menu_visible = ( (Boolean)value ).booleanValue();
+          setMenuVisible((Boolean) value);          
         }
-        else
+        else {
           super.processInput(name, value);
+        }
     }
-
 }

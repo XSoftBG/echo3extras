@@ -47,30 +47,18 @@ public class ContextMenuPeer extends AbstractMenuPeer {
       addOutputProperty(ContextMenu.PROPERTY_MENU_VISIBLE);
     }   
 
-    public Object getOutputProperty(Context context, Component component, String propertyName, int propertyIndex) 
-    {
-      if( propertyName.equals(ContextMenu.PROPERTY_MENU_VISIBLE) ) 
-        return Boolean.valueOf( ( (ContextMenu)component ).isMenuVisible() );
-      else
-        return super.getOutputProperty(context, component, propertyName, propertyIndex);
-    }
-
     public Class getInputPropertyClass(String propertyName) 
     {
-      if( propertyName.equals(ContextMenu.PROPERTY_MENU_VISIBLE) ) 
-        return Boolean.class;      
-      else
-        return super.getInputPropertyClass(propertyName); 
+      if (propertyName.equals(ContextMenu.PROPERTY_MENU_VISIBLE)) {
+          return Boolean.class;
+      } else {
+          return super.getInputPropertyClass(propertyName); 
+      }
     }
   
-    public void storeInputProperty(Context context, Component component, String propertyName, int propertyIndex, Object newValue) 
-    {
-      if( propertyName.equals(ContextMenu.PROPERTY_MENU_VISIBLE) ) 
-      {
-        ClientUpdateManager clientUpdateManager =  (ClientUpdateManager) context.get(ClientUpdateManager.class);
+    public void storeInputProperty(Context context, Component component, String propertyName, int propertyIndex, Object newValue) {
+        final ClientUpdateManager clientUpdateManager = (ClientUpdateManager) context.get(ClientUpdateManager.class);
         clientUpdateManager.setComponentProperty(component, propertyName, newValue);
-      }
-      super.storeInputProperty(context, component, propertyName, propertyIndex, newValue);
     }
  
     /**
