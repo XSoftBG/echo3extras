@@ -33,6 +33,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -250,10 +251,25 @@ public class Tree extends Component {
             rowToTreePathCache.clear();
             row = 0;
             doRender();
+
+            // removed selections for deleted nodes
+            final TreePath[] selectionPaths = selectionModel.getSelectionPaths();
+            for (int i = 0; i < selectionPaths.length; i++) {
+                final TreePath selectionPath = selectionPaths[i];
+                if( !treePathToComponentCache.containsKey(selectionPath) )
+                  selectionModel.removeSelectionPath(selectionPath);
+            }
+            // removed expanded states for deleted nodes
+            final List expandedList = new LinkedList(expandedPaths);
+            for (Iterator it = expandedList.iterator(); it.hasNext();) {
+                final TreePath expandedPath = (TreePath)it.next();
+                if( !treePathToComponentCache.containsKey(expandedPath) )
+                  expandedPaths.remove(expandedPath);
+            }
         }
     }
 
-    private Renderer renderer = new Renderer();
+    private final Renderer renderer = new Renderer();
 
     public static final String PROPERTY_ACTION_COMMAND = "actionCommand";
     public static final String PROPERTY_BORDER = "border";
@@ -307,89 +323,62 @@ public class Tree extends Component {
     /**
      * Listener to monitor changes to model.
      */
-    private TreeModelListener modelListener = new TreeModelListener() {
+    private final TreeModelListener modelListener = new TreeModelListener() {
 
         /**
          * @see nextapp.echo.extras.app.event.TreeModelListener#treeStructureChanged(
          *          nextapp.echo.extras.app.event.TreeModelEvent)
          */
-        public void treeStructureChanged(TreeModelEvent e) {
+        private void treeUpdated() {
             invalidate();
             if (isAutoCreateColumnsFromModel()) {
                 createDefaultColumnsFromModel();
             }
         }
+        
+        public void treeStructureChanged(TreeModelEvent e) { treeUpdated(); }
 
         /**
          * @see nextapp.echo.extras.app.event.TreeModelListener#treeNodesRemoved(
          *          nextapp.echo.extras.app.event.TreeModelEvent)
          */
-        public void treeNodesRemoved(TreeModelEvent e) {
-            invalidate();
-            TreePath removedPath = e.getTreePath();
-            TreePath[] selectionPaths = getSelectionModel().getSelectionPaths();
-            for (int i = 0; i < selectionPaths.length; i++) {
-                TreePath selectionPath = selectionPaths[i];
-                if (removedPath.isDescendant(selectionPath)) {
-                    getSelectionModel().removeSelectionPath(selectionPath);
-                }
-            }
-            if (isAutoCreateColumnsFromModel()) {
-                createDefaultColumnsFromModel();
-            }
-        }
+        public void treeNodesRemoved(TreeModelEvent e) { treeUpdated(); }
 
         /**
          * @see nextapp.echo.extras.app.event.TreeModelListener#treeNodesChanged(
          *          nextapp.echo.extras.app.event.TreeModelEvent)
          */
-        public void treeNodesChanged(TreeModelEvent e) {
-            invalidate();
-            if (isAutoCreateColumnsFromModel()) {
-                createDefaultColumnsFromModel();
-            }
-        }
+        public void treeNodesChanged(TreeModelEvent e) { treeUpdated(); }
 
         /**
          * @see nextapp.echo.extras.app.event.TreeModelListener#treeNodesAdded(
          *          nextapp.echo.extras.app.event.TreeModelEvent)
          */
-        public void treeNodesAdded(TreeModelEvent e) {
-            invalidate();
-            if (isAutoCreateColumnsFromModel()) {
-                createDefaultColumnsFromModel();
-            }
-        }
+        public void treeNodesAdded(TreeModelEvent e) { treeUpdated(); }
     };
     
     /**
      * Listener to monitor changes to model.
      */
-    private TreeColumnModelListener columnModelListener = new TreeColumnModelListener() {
+    private final TreeColumnModelListener columnModelListener = new TreeColumnModelListener() {
 
         /**
          * @see nextapp.echo.extras.app.event.TreeColumnModelListener#columnAdded(
          *      nextapp.echo.extras.app.event.TreeColumnModelEvent)
          */
-        public void columnAdded(TreeColumnModelEvent e) {
-            invalidate();
-        }
+        public void columnAdded(TreeColumnModelEvent e) { invalidate(); }
 
         /**
          * @see nextapp.echo.extras.app.event.TreeColumnModelListener#columnMoved(
          *      nextapp.echo.extras.app.event.TreeColumnModelEvent)
          */
-        public void columnMoved(TreeColumnModelEvent e) {
-            invalidate();
-        }
+        public void columnMoved(TreeColumnModelEvent e) { invalidate(); }
 
         /**
          * @see nextapp.echo.extras.app.event.TreeColumnModelListener#columnRemoved(
          *      nextapp.echo.extras.app.event.TreeColumnModelEvent)
          */
-        public void columnRemoved(TreeColumnModelEvent e) {
-            invalidate();
-        }
+        public void columnRemoved(TreeColumnModelEvent e) { invalidate(); }
         
         /**
          * @see nextapp.echo.extras.app.event.TreeColumnModelListener#columnResized(
@@ -401,7 +390,7 @@ public class Tree extends Component {
         
     };
     
-    private ChangeListener changeListener = new ChangeListener() {
+    private final ChangeListener changeListener = new ChangeListener() {
         public void stateChanged(ChangeEvent e) {
             if (!suppressChangeNotifications) {
                 firePropertyChange(SELECTION_CHANGED_PROPERTY, null, null);
@@ -418,7 +407,7 @@ public class Tree extends Component {
         }
     };
     
-    private PropertyChangeListener propertyChangeListener = new TreeSelectionModelListener();
+    private final PropertyChangeListener propertyChangeListener = new TreeSelectionModelListener();
 
     private TreeModel model;
     private TreeColumnModel columnModel;
@@ -521,11 +510,12 @@ public class Tree extends Component {
      * Any nodes below it will not be collapsed, so, if this node is expanded
      * all nodes below this node that have the expanded state will be rendered
      * expanded.
-     * 
+     * @return <code>true</code> if the tree path expansion state on the given row is
+     *         changed, <code>false</code> if not
      * @param path the path to collapse
      */
-    public void collapse(TreePath path) {
-        setExpandedState(path, false);
+    public boolean collapse(TreePath path) {
+        return setExpandedState(path, false);
     }
     
     /**
@@ -575,11 +565,12 @@ public class Tree extends Component {
     
     /**
      * Expand the node identified by the given path.
-     * 
+     * @return <code>true</code> if the tree path expansion state on the given row is
+     *         changed, <code>false</code> if not
      * @param path the path to expand
      */
-    public void expand(TreePath path) {
-        setExpandedState(path, true);
+    public boolean expand(TreePath path) {
+        return setExpandedState(path, true);
     }
     
     /**
@@ -615,12 +606,9 @@ public class Tree extends Component {
         if (!hasEventListenerList()) {
             return;
         }
-        EventListener[] listeners = getEventListenerList().getListeners(ActionListener.class);
-        ActionEvent e = null;
+        final EventListener[] listeners = getEventListenerList().getListeners(ActionListener.class);
+        final ActionEvent e = new ActionEvent(this, (String) getRenderProperty(PROPERTY_ACTION_COMMAND));
         for (int i = 0; i < listeners.length; ++i) {
-            if (e == null) {
-                e = new ActionEvent(this, (String) getRenderProperty(PROPERTY_ACTION_COMMAND));
-            } 
             ((ActionListener) listeners[i]).actionPerformed(e);
         }
     }
@@ -680,7 +668,7 @@ public class Tree extends Component {
     
     /**
      * Returns the default <code>TreeCellRenderer</code> for the specified 
-     * column class.  The default renderer will be used in the event that
+     * column class.  The default ff will be used in the event that
      * a <code>TreeColumn</code> does not provide a specific renderer.
      * 
      * @param columnClass the column <code>Class</code>
@@ -801,12 +789,10 @@ public class Tree extends Component {
      * @param newValue the new column model
      */
     public void setColumnModel(TreeColumnModel newValue) {
-        invalidate();
-        
         if (newValue == null) {
             throw new IllegalArgumentException("The model may not be null.");
         }
-        
+        invalidate();
         TreeColumnModel oldValue = columnModel;
         if (oldValue != null) {
             oldValue.removeColumnModelListener(columnModelListener);
@@ -852,17 +838,18 @@ public class Tree extends Component {
     /**
      * Set the expansion state for the given tree path. When a tree path is
      * expanded, all parent paths will be expanded too.
-     * 
+     * @return <code>true</code> if the tree path expansion state on the given row is
+     *         changed, <code>false</code> if not
      * @param treePath the path to expand or collapse
      * @param state the new expansion state
      */
-    public void setExpandedState(TreePath treePath, boolean state) {
+    protected boolean setExpandedState(TreePath treePath, boolean state) {
         if (model.isLeaf(treePath.getLastPathComponent())) {
-            return;
+            return false;
         }
         if (expandedPaths.contains(treePath) == state) {
             // do not fire any events when we are already in the desired state.
-            return;
+            return false;
         }
         if (state) {
             // make sure the parent path is expanded
@@ -881,10 +868,12 @@ public class Tree extends Component {
             if (topExpanded != null && valid) {
                 renderer.update(topExpanded, true);
             }
+            return topExpanded != null;
         } else {
             expandedPaths.remove(treePath);
             renderer.update(treePath, false);
             fireExpansionStateUpdate(treePath, state);
+            return true;
         }
     }
     
@@ -948,6 +937,11 @@ public class Tree extends Component {
         return autoCreateColumnsFromModel;
     }
     
+    /**
+     * @return the unmodifiable set of expanded paths.
+     */
+    public Set getExpandedPaths() { return Collections.unmodifiableSet(expandedPaths); }
+
     /**
      * @param row the row to get the expanded state for
      * @return <code>true</code> if the tree path on the given row is
@@ -1263,7 +1257,7 @@ public class Tree extends Component {
      */
     private void invalidate() {
         valid = false;
-    }
+   }
     
     /**
      * Removes an <code>ActionListener</code> from the <code>Tree</code>.
@@ -1290,30 +1284,24 @@ public class Tree extends Component {
      * @param newValue the new model (may not be null)
      */
     public void setModel(TreeModel newValue) {
-        invalidate();
-
         if (newValue == null) {
             throw new IllegalArgumentException("The model may not be null.");
         }
-
+        invalidate();
         TreeModel oldValue = model;
         if (oldValue != null) {
             oldValue.removeTreeModelListener(modelListener);
         }
         newValue.addTreeModelListener(modelListener);
         model = newValue;
-        
         expandedPaths.clear();
-        
         if (isAutoCreateColumnsFromModel()) {
             createDefaultColumnsFromModel();
         }
 
         firePropertyChange(MODEL_CHANGED_PROPERTY, oldValue, newValue);
         
-        if (model.getRoot() != null) {
-            setExpandedState(new TreePath(model.getRoot()), true);
-        }
+        if (model.getRoot() != null) setExpandedState(new TreePath(model.getRoot()), true);
     }
     
     /**
@@ -1404,7 +1392,7 @@ public class Tree extends Component {
      * @param newValue true if rollover effects should be enabled
      */
     public void setRolloverEnabled(boolean newValue) {
-        set(PROPERTY_ROLLOVER_ENABLED, new Boolean(newValue));
+        set(PROPERTY_ROLLOVER_ENABLED, Boolean.valueOf(newValue));
     }
 
     /**
@@ -1447,10 +1435,10 @@ public class Tree extends Component {
     private void setSelectedIndices(int[] selectedIndices) {
         // Temporarily suppress the Tables selection event notifier.
         suppressChangeNotifications = true;
-        TreeSelectionModel selectionModel = getSelectionModel();
-        selectionModel.clearSelection();
+        final TreeSelectionModel sm = getSelectionModel();
+        sm.clearSelection();
         for (int i = 0; i < selectedIndices.length; ++i) {
-            selectionModel.addSelectionPath(getPathForRow(selectedIndices[i]));
+            sm.addSelectionPath(getPathForRow(selectedIndices[i]));
         }
         // End temporary suppression.
         suppressChangeNotifications = false;
