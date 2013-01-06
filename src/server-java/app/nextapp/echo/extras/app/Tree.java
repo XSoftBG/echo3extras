@@ -843,7 +843,7 @@ public class Tree extends Component {
      * @param treePath the path to expand or collapse
      * @param state the new expansion state
      */
-    protected boolean setExpandedState(TreePath treePath, boolean state) {
+    public boolean setExpandedState(TreePath treePath, boolean state) {
         if (model.isLeaf(treePath.getLastPathComponent())) {
             return false;
         }
@@ -938,9 +938,9 @@ public class Tree extends Component {
     }
     
     /**
-     * @return the unmodifiable set of expanded paths.
+     * @return the set of all expanded paths.
      */
-    public Set getExpandedPaths() { return Collections.unmodifiableSet(expandedPaths); }
+    public Set getExpandedPaths() { return (Set) ((HashSet)expandedPaths).clone(); }
 
     /**
      * @param row the row to get the expanded state for
