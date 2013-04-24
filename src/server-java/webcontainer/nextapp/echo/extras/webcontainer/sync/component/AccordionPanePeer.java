@@ -145,7 +145,7 @@ public class AccordionPanePeer extends AbstractComponentSynchronizePeer {
      */
     private Integer getTabIndex(Context context, AccordionPane accordionPane, String clientRenderId) {
         UserInstance userInstance = (UserInstance) context.get(UserInstance.class);
-        Component[] children = accordionPane.getVisibleComponents();
+        Component[] children = accordionPane.getComponents();
         for (int i = 0; i < children.length; ++i) {
             if (userInstance.getClientRenderId(children[i]).equals(clientRenderId)) {
                 return new Integer(i);
