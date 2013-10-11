@@ -148,7 +148,7 @@ public class TabPanePeer extends AbstractComponentSynchronizePeer {
             if (componentCount == 0) {
                 return null;
             }
-            Component activeTab;
+            final Component activeTab;
             int activeTabIndex = tabPane.getActiveTabIndex();
             if (activeTabIndex == -1) {
                 activeTab = tabPane.getVisibleComponent(0);
@@ -174,7 +174,7 @@ public class TabPanePeer extends AbstractComponentSynchronizePeer {
      */
     private Integer getTabIndex(Context context, TabPane tabPane, String clientRenderId) {
         UserInstance userInstance = (UserInstance) context.get(UserInstance.class);
-        Component[] children = tabPane.getComponents();
+        Component[] children = tabPane.getVisibleComponents();
         for (int i = 0; i < children.length; ++i) {
             if (userInstance.getClientRenderId(children[i]).equals(clientRenderId)) {
                 return new Integer(i);
