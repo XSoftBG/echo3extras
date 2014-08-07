@@ -888,7 +888,6 @@ Extras.Sync.TabPane = Core.extend(Echo.Render.ComponentSync, {
             }
         }
         if (!fullRender) {
-            var activeTabRemoved = false;
             var removedChildren = update.getRemovedChildren();
             if (removedChildren) {
                 // Remove children.

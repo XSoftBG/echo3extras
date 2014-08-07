@@ -148,7 +148,7 @@ public class TabPanePeer extends AbstractComponentSynchronizePeer {
             if (componentCount == 0) {
                 return null;
             }
-            Component activeTab;
+            final Component activeTab;
             int activeTabIndex = tabPane.getActiveTabIndex();
             if (activeTabIndex == -1) {
                 activeTab = tabPane.getVisibleComponent(0);
